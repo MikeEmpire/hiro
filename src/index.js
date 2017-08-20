@@ -1,35 +1,32 @@
 import './css/index.css';
 import './js/jquery-1.11.1.min';
+let vid = document.getElementById("bgvid");
+let pauseButton = document.querySelector("button");
 
-import {getUsers, deleteUser} from './api/userApi';
+if (window.matchMedia('(prefers-reduced-motion)').matches) {
+  vid.removeAttribute("autoplay");
+  vid.pause();
+  pauseButton.innerHTML = "Paused";
+}
 
-// Populate table of users via API call.
-getUsers().then(result => {
-  let usersBody = "";
+function vidFade() {
+  vid.classList.add("stopfade");
+}
 
-  result.forEach(user => {
-    usersBody+= `<tr>
-      <td><a href="#" data-id="${user.id}" class="deleteUser">Delete</a></td>
-      <td>${user.id}</td>
-      <td>${user.firstName}</td>
-      <td>${user.lastName}</td>
-      <td>${user.email}</td>
-      </tr>`
-  });
-
-  global.document.getElementById('users').innerHTML = usersBody;
-
-  const deleteLinks = global.document.getElementsByClassName('deleteUser');
-
-  // Must use array.from to create a real array from a DOM collection
-  // getElementsByClassname only returns an "array like" object
-  Array.from(deleteLinks, link => {
-    link.onclick = function(event) {
-      const element = event.target;
-      event.preventDefault();
-      deleteUser(element.attributes["data-id"].value);
-      const row = element.parentNode.parentNode;
-      row.parentNode.removeChild(row);
-    };
-  });
+vid.addEventListener('ended', () => {
+  // only functional if "loop" is removed
+  vid.pause();
+  // to capture IE10
+  vidFade();
 });
+
+pauseButton.addEventListener("click", () => {
+  vid.classList.toggle("stopfade");
+  if (vid.paused) {
+    vid.play();
+    pauseButton.innerHTML = "Pause";
+  } else {
+    vid.pause();
+    pauseButton.innerHTML = "Paused";
+  }
+})
